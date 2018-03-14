@@ -1,22 +1,12 @@
 {
-    "name": "payum/skeleton",
-    "type": "project",
-    "description": "The Payum extension. Rapid extensino development",
-    "keywords": ["payment"],
-    "homepage": "https://payum.forma-pro.com",
+    "name": "tilleuls/payum-bambora-north-america",
+    "description": "Payum extension for Bambora (North America) payment gateway integration",
+    "keywords": ["payum", "bambora", "north america", "payment gateway", "payment API", "payment", "payments", "checkout", "API"],
     "license": "MIT",
     "authors": [
         {
-            "name": "Kotlyar Maksim",
-            "email": "kotlyar.maksim@gmail.com"
-        },
-        {
-            "name":     "Payum project",
-            "homepage": "https://payum.forma-pro.com/"
-        },
-        {
-            "name":     "Community contributions",
-            "homepage": "https://github.com/Payum/AuthorizeNetAim/contributors"
+            "name": "Teoh Han Hui",
+            "email": "hanhui@les-tilleuls.coop"
         }
     ],
     "require": {
@@ -26,16 +16,10 @@
         "payum/core": "^1.5@dev",
         "php-http/guzzle6-adapter": "^1.0"
     },
-    "config": {
-        "bin-dir": "bin"
-    },
     "autoload": {
-        "psr-0": { "Payum\\Skeleton": "" }
+        "psr-4": { "CoopTilleuls\\Payum\\BamboraNorthAmerica\\": "" }
     },
-    "target-dir": "Payum/Skeleton",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.5-dev"
-        }
+    "config": {
+        "sort-packages": true
     }
 }

@@ -1,13 +1,17 @@
 <?php
-namespace Payum\Skeleton\Action;
 
+namespace CoopTilleuls\Payum\BamboraNorthAmerica\Action;
+
+use CoopTilleuls\Payum\BamboraNorthAmerica\Request\Api\MakePayment;
+use CoopTilleuls\Payum\BamboraNorthAmerica\Request\Api\ObtainToken;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\Bridge\Spl\ArrayObject;
+use Payum\Core\Exception\RequestNotSupportedException;
+use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\Capture;
-use Payum\Core\Exception\RequestNotSupportedException;
 
-class CaptureAction implements ActionInterface
+class CaptureAction implements ActionInterface, GatewayAwareInterface
 {
     use GatewayAwareTrait;
 
@@ -16,19 +20,30 @@ class CaptureAction implements ActionInterface
      *
      * @param Capture $request
      */
-    public function execute($request)
+    public function execute($request): void
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
         $model = ArrayObject::ensureArrayObject($request->getModel());
 
-        throw new \LogicException('Not implemented');
+        if (isset($model['approved']) || isset($model['code'])) {
+            return;
+        }
+
+        if (!isset($model['token'])) {
+            $obtainToken = new ObtainToken($request->getToken());
+            $obtainToken->setModel($model);
+
+            $this->gateway->execute($obtainToken);
+        }
+
+        $this->gateway->execute(new MakePayment($model));
     }
 
     /**
      * {@inheritDoc}
      */
-    public function supports($request)
+    public function supports($request): bool
     {
         return
             $request instanceof Capture &&

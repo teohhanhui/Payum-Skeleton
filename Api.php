@@ -1,5 +1,6 @@
 <?php
-namespace Payum\Skeleton;
+
+namespace CoopTilleuls\Payum\BamboraNorthAmerica;
 
 use Http\Message\MessageFactory;
 use Payum\Core\Exception\Http\HttpException;
@@ -7,26 +8,13 @@ use Payum\Core\HttpClientInterface;
 
 class Api
 {
-    /**
-     * @var HttpClientInterface
-     */
+    const PAYMENTS_PATH = '/payments';
+
     protected $client;
-
-    /**
-     * @var MessageFactory
-     */
     protected $messageFactory;
-
-    /**
-     * @var array
-     */
     protected $options = [];
 
     /**
-     * @param array               $options
-     * @param HttpClientInterface $client
-     * @param MessageFactory      $messageFactory
-     *
      * @throws \Payum\Core\Exception\InvalidArgumentException if an option is invalid
      */
     public function __construct(array $options, HttpClientInterface $client, MessageFactory $messageFactory)
@@ -36,31 +24,31 @@ class Api
         $this->messageFactory = $messageFactory;
     }
 
-    /**
-     * @param array $fields
-     *
-     * @return array
-     */
-    protected function doRequest($method, array $fields)
+    public function makePayment(array $fields): array
     {
-        $headers = [];
+        return $this->doRequest('POST', self::PAYMENTS_PATH, $fields);
+    }
 
-        $request = $this->messageFactory->createRequest($method, $this->getApiEndpoint(), $headers, http_build_query($fields));
+    protected function doRequest(string $method, string $path, array $fields): array
+    {
+        $headers = [
+            'Authorization' => 'Passcode '.base64_encode("{$this->options['merchant_id']}:{$this->options['api_access_passcode']}"),
+            'Content-Type' => 'application/json',
+        ];
+
+        $request = $this->messageFactory->createRequest($method, $this->getApiEndpoint().$path, $headers, json_encode($fields));
 
         $response = $this->client->send($request);
 
-        if (false == ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300)) {
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
             throw HttpException::factory($request, $response);
         }
 
-        return $response;
+        return json_decode((string) $response->getBody(), true);
     }
 
-    /**
-     * @return string
-     */
-    protected function getApiEndpoint()
+    protected function getApiEndpoint(): string
     {
-        return $this->options['sandbox'] ? 'http://sandbox.example.com' : 'http://example.com';
+        return 'https://api.na.bambora.com/v1';
     }
 }

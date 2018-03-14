@@ -1,12 +1,13 @@
 <?php
-namespace Payum\Skeleton\Action;
+
+namespace CoopTilleuls\Payum\BamboraNorthAmerica\Action;
 
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\Bridge\Spl\ArrayObject;
+use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\Authorize;
-use Payum\Core\Exception\RequestNotSupportedException;
 
 class AuthorizeAction implements ActionInterface, GatewayAwareInterface
 {
@@ -17,7 +18,7 @@ class AuthorizeAction implements ActionInterface, GatewayAwareInterface
      *
      * @param Authorize $request
      */
-    public function execute($request)
+    public function execute($request): void
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
@@ -29,7 +30,7 @@ class AuthorizeAction implements ActionInterface, GatewayAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function supports($request)
+    public function supports($request): bool
     {
         return
             $request instanceof Authorize &&
